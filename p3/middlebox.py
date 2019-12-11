@@ -47,11 +47,16 @@ def switchy_main(net):
             Should I drop it?
             '''
             if not drop(percent):
-                delay (mean,std)
+
                 #need to change out packet header info
+                tempHeader = Ethernet()
+                tempHeader.src = '40:00:00:00:00:01'
+                tempHeader.dst = '20:00:00:00:00:01'
+                pkt[0] = tempHeader
             '''
             If not, modify headers, add a delay & send to blastee
             '''
+                delay(mean, std)
                 net.send_packet("middlebox-eth1", pkt)
         elif dev == "middlebox-eth1":
             log_debug("Received from blastee")
@@ -61,6 +66,10 @@ def switchy_main(net):
             Don't add any delay as well
             net.send_packet("middlebox-eth0", pkt)
             '''
+            tempHeader = Ethernet()
+            tempHeader.src = '40:00:00:00:00:01'
+            tempHeader.dst = '10:00:00:00:00:01'
+            pkt[0] = tempHeader
 
             net.send_packet("middlebox-eth0", pkt)
 
@@ -86,14 +95,3 @@ def paramExtraction():
             elif 'dm ' in char:
                 dm = char.split('dm ')[1]
     return probability,seed,dstd,dm
-
-def createHeader(dev,packet):
-    #construct header
-    tempHeader = Ethernet()
-    if dev == "middlebox-eth0":
-        tempHeader.src = mymacs[1]#TODO:double check
-    else:
-        tempHeader.src = mymacs[0]#TODO: double check
-    tempHeader.dst=packet.get_header(Ethernet).dst
-    packet[0] = tempHeader
-    return
